@@ -23,7 +23,7 @@ Este é um programa desenvolvido em Python que realiza a correção automática 
 2. Certifique-se de ter instalado os requisitos mencionados acima.
 3. Execute o arquivo `correcao_codigo.py` utilizando o Python.
 4. A interface gráfica será exibida, permitindo que você insira ou abra um arquivo de código.
-5. ![Imagem da Interface](https://github.com/haimonvieira/Correcao-Identacao-Nas-Linguagens/blob/main/Captura%20de%20tela%202023-05-21%20150135.png)
+  ![Imagem da Interface](https://github.com/haimonvieira/Correcao-Identacao-Nas-Linguagens/blob/main/Captura%20de%20tela%202023-05-21%20150135.png)
 6. Selecione a linguagem do código (Python, Java ou C) e clique no botão "Corrigir" para corrigir a indentação e verificar a lógica.
 7. O resultado da correção será exibido na caixa de texto e qualquer erro de sintaxe ou lógica será destacado.
 8. Você pode salvar o código corrigido em um arquivo ou copiá-lo para a área de transferência.

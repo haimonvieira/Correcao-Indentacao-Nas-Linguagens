@@ -33,7 +33,7 @@ Este projeto está aberto a contribuições. Sinta-se à vontade para enviar pul
 
 ## Aviso
 
-A funcionalidade de verificação de lógica para as linguagens Java e C ainda está em desenvolvimento e pode não funcionar corretamente. Contribuições para aprimorar essa funcionalidade são bem-vindas.
+A funcionalidade de verificação de lógica para as linguagens Python, Java e C ainda está em desenvolvimento e pode não funcionar corretamente. Contribuições para aprimorar essa funcionalidade são bem-vindas.
 
 ## Licença
 

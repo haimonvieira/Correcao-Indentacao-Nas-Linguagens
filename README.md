@@ -1,5 +1,3 @@
-# Correcao-Identacao-Nas-Linguagens
-Correção de indentação nas linguagens: Python, Java e C.
 # Correção Automática de Código
 
 Este é um programa desenvolvido em Python que realiza a correção automática de código em diferentes linguagens de programação, incluindo Python, Java e C. Ele oferece recursos para corrigir a indentação e verificar a lógica do código.

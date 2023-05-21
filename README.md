@@ -32,7 +32,7 @@ Este é um programa desenvolvido em Python que realiza a correção automática 
 
 Este projeto está aberto a contribuições. Sinta-se à vontade para enviar pull requests com melhorias, correções ou novas funcionalidades.
 
-## Aviso
+## AVISO
 
 A funcionalidade de verificação de lógica para as linguagens Python, Java e C ainda está em desenvolvimento e pode não funcionar corretamente. Contribuições para aprimorar essa funcionalidade são bem-vindas.
 

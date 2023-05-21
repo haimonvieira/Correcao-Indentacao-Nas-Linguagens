@@ -37,4 +37,4 @@ A funcionalidade de verificação de lógica para as linguagens Java e C ainda e
 
 ## Licença
 
-Este projeto está licenciado sob a [Licença MIT](https://github.com/seu-usuario/seu-repositorio/blob/main/LICENSE).
+Este projeto está licenciado sob a [Licença MIT](https://github.com/haimonvieira/Correcao-Identacao-Nas-Linguagens/blob/main/LICENSE).

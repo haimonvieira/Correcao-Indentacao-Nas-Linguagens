@@ -1,233 +1,101 @@
 import tkinter as tk
-from tkinter import filedialog
 from tkinter import ttk
 import parso
 import autopep8
-import javalang
-from clang import cindex
+
 
 def corrigir_indentacao(codigo, linguagem):
     if linguagem == 'Python':
         return corrigir_indentacao_python(codigo)
-    elif linguagem == 'Java':
-        return corrigir_indentacao_java(codigo)
-    elif linguagem == 'C':
-        return corrigir_indentacao_c(codigo)
+    elif linguagem == 'Java' or linguagem == 'C':
+        return corrigir_indentacao_c_java(codigo)
     else:
         return codigo
 
-
-
 def corrigir_indentacao_python(codigo):
     try:
-        # Corrighe a indentação do código
         fixed_code = autopep8.fix_code(codigo)
-        fixed_code_lines = fixed_code.split('\n')
-
-        fixed_lines = fixed_code.split('\n')
-        for i in range(1, len(fixed_code_lines)):
-            if fixed_code_lines[i].strip().startswith("return"):
-                fixed_code_lines[i] = ' ' * 4 + fixed_code_lines[i]
-
-        # Une as linhas corrigidas
-        return '\n'.join(fixed_lines)
-
+        return fixed_code
     except SyntaxError as e:
-        return False
+        return ""
 
-def corrigir_indentacao_java(codigo):
-    tree = javalang.parse.parse(codigo)
-    return tree.accept(IndentVisitor())
+def corrigir_indentacao_c_java(codigo):
+    codigo_corrigido = ""
+    nivel_indentacao = 0
+    linhas = codigo.split('\n')
+    for i in range(len(linhas)):
+        linha = linhas[i].strip()
 
+        if linha.endswith("}") or linha.endswith("};"):
+            nivel_indentacao -= 1
 
-def corrigir_indentacao_c(codigo):
-    return cindex.format(codigo)
+        if linha:
+            codigo_corrigido += "    " * nivel_indentacao + linha + "\n"
 
-
-class IndentVisitor:
-    def __init__(self):
-        super().__init__()
-        self.indentation_level = 0
-
-    def visit(self, node):
-        node._modified_indentation_level = self.indentation_level
-        super().visit(node)
-
-    def visit_ClassDeclaration(self, node):
-        self.generic_visit(node)
-        self.indentation_level += 1
-
-    def visit_MethodDeclaration(self, node):
-        self.generic_visit(node)
-        self.indentation_level += 1
-
-    def visit_BlockStatement(self, node):
-        self.generic_visit(node)
-        self.indentation_level -= 1
-
-    def visit_IfStatement(self, node):
-        self.generic_visit(node)
-        self.indentation_level += 1
-
-    def visit_ElseStatement(self, node):
-        self.generic_visit(node)
-        self.indentation_level -= 1
-
-    def visit_ForStatement(self, node):
-        self.generic_visit(node)
-        self.indentation_level += 1
-
-    def visit_WhileStatement(self, node):
-        self.generic_visit(node)
-        self.indentation_level += 1
-
-    def visit_DoStatement(self, node):
-        self.generic_visit(node)
-        self.indentation_level += 1
-
-    def visit_SwitchStatement(self, node):
-        self.generic_visit(node)
-        self.indentation_level += 1
-
-    def visit_CaseGroup(self, node):
-        self.generic_visit(node)
-        self.indentation_level -= 1
-
-    def visit_BreakStatement(self, node):
-        self.generic_visit(node)
-        self.indentation_level -= 1
-
-    def visit_ReturnStatement(self, node):
-        self.generic_visit(node)
-        self.indentation_level -= 1
-
-    def visit_ContinueStatement(self, node):
-        self.generic_visit(node)
-        self.indentation_level -= 1
-
-    def visit_ThrowStatement(self, node):
-        self.generic_visit(node)
-        self.indentation_level -= 1
-
-    def visit_TryStatement(self, node):
-        self.generic_visit(node)
-        self.indentation_level += 1
-
-    def visit_CatchClause(self, node):
-        self.generic_visit(node)
-        self.indentation_level -= 1
-
-    def visit_FinallyClause(self, node):
-        self.generic_visit(node)
-        self.indentation_level -= 1
-
-
-def verificar_codigo(codigo):
-    try:
-        parso.parse(codigo)
-        return None  # Retorna None quando não há erro de sintaxe
-    except parso.ParserSyntaxError as e:
-        return e.start_pos[0], e.start_pos[1], e.text
-
-
-
-def corrigir_e_verificar_codigo(codigo, linguagem):
-    global codigo_corrigido
-    codigo_corrigido = corrigir_indentacao(codigo, linguagem)
-    erro_sintaxe = verificar_codigo(codigo_corrigido)
-
-    if codigo_corrigido:
-        verificar_codigo(codigo_corrigido)
-        codigo_text.delete('1.0', 'end')
-        codigo_text.insert('1.0', codigo_corrigido)
-        feedback_label.config(text="Código corrigido", fg="green")
-    else:
-        linha, coluna, texto = erro_sintaxe
-        feedback_label.config(text=f"Erro de sintaxe na linha {linha}, coluna {coluna}: {texto}", fg="red")
-        codigo_text.tag_configure("error", foreground="red")
-        codigo_text.delete('1.0', 'end')
-        codigo_text.insert('1.0', codigo_corrigido)
-        codigo_text.tag_add("error", f"{linha}.{coluna}", f"{linha}.{coluna + len(texto)}")
-
-
-def abrir_arquivo():
-    arquivo = filedialog.askopenfilename(filetypes=[('Arquivos Python', '*.py')])
-    if arquivo:
-        with open(arquivo, 'r') as file:
-            codigo = file.read()
-        codigo_text.delete('1.0', 'end')
-        codigo_text.insert('1.0', codigo)
-
-
-def salvar_arquivo():
-    arquivo = filedialog.asksaveasfilename(filetypes=[('Arquivos Python', '*.py')])
-    if arquivo:
-        if not arquivo.endswith('.py'):
-            arquivo += '.py'
-        with open(arquivo, 'w') as file:
-            file.write(codigo_text.get('1.0', 'end-1c'))
-        feedback_label.config(text="Código corrigido salvo", fg="green")
-
-
-def limpar_codigo():
-    codigo_text.delete('1.0', 'end')
-
+        if "{" in linha and not linha.endswith("}") and not linha.endswith("};"):
+            nivel_indentacao += 1
+    return codigo_corrigido
 
 def copiar_codigo():
-    codigo = codigo_text.get('1.0', 'end-1c')
-    janela.clipboard_clear()
-    janela.clipboard_append(codigo)
+    root.clipboard_clear()
+    root.clipboard_append(codigo_text.get('1.0', 'end'))
+
+def toggle_dark_mode():
+    if dark_var.get():
+        root.configure(background='#2b2b2b')
+        mainframe.configure(background='#2b2b2b')
+        codigo_text.configure(bg='#2b2b2b', fg='#ffffff')
+        style.configure('TCombobox', fieldbackground='#2b2b2b', foreground='#ffffff', background='#2b2b2b')
+        style.configure("BW.TButton", foreground="#ffffff", background="#2b2b2b")
+        style.map("BW.TButton", foreground=[('pressed', 'red'), ('active', 'blue')],
+             background=[('pressed', '!disabled', 'black'), ('active', 'white')])
+    else:
+        root.configure(background='#f0f0f0')
+        mainframe.configure(background='#f0f0f0')
+        codigo_text.configure(bg='#ffffff', fg='#000000')
+        style.configure('TCombobox', fieldbackground='#ffffff', foreground='#000000', background='#f0f0f0')
+        style.configure("BW.TButton", foreground="black", background="#f0f0f0")
+        style.map("BW.TButton", foreground=[('pressed', 'red'), ('active', 'blue')],
+             background=[('pressed', '!disabled', 'black'), ('active', 'white')])
 
 
-# Cria a janela principal
-janela = tk.Tk()
-janela.title('Correção Automática de Código')
+root = tk.Tk()
+root.title("Corretor de Código")
 
-# Cria uma caixa de texto para inserir o código
-codigo_text = tk.Text(janela, height=20, width=80)
-codigo_text.pack()
-
-# Cria a barra de rolagem para a caixa de texto
-scrollbar = tk.Scrollbar(janela)
-scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-codigo_text.config(yscrollcommand=scrollbar.set)
-scrollbar.config(command=codigo_text.yview)
-
-# Crie um estilo
 style = ttk.Style()
-style.configure('TButton', font=('Arial', 12))
-style.configure('TLabel', font=('Arial', 12))
+style.theme_use("clam")
+style.configure(".", font=("Helvetica", 16))
+style.configure("BW.TButton", foreground="black", background="#f0f0f0")
+style.map("BW.TButton", foreground=[('pressed', 'red'), ('active', 'blue')],
+             background=[('pressed', '!disabled', 'black'), ('active', 'white')])
 
-# Cria os botões
-corrigir_button = ttk.Button(janela, text='Corrigir', command=lambda: corrigir_e_verificar_codigo(codigo_text.get('1.0', 'end-1c'), linguagem_combobox.get()))
-abrir_button = ttk.Button(janela, text='Abrir Arquivo', command=abrir_arquivo)
-salvar_button = ttk.Button(janela, text='Salvar Arquivo', command=salvar_arquivo)
-limpar_button = ttk.Button(janela, text='Limpar', command=limpar_codigo)
-copiar_button = ttk.Button(janela, text='Copiar', command=copiar_codigo)
+mainframe = tk.Frame(root, background='#f0f0f0', padx=10, pady=10)
+mainframe.grid(column=0, row=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
-# Cria um rótulo para exibir o feedback
-feedback_label = tk.Label(janela, text="", fg="green")
-feedback_label.pack()
+codigo_text = tk.Text(mainframe, wrap=tk.NONE, width=80, height=20, font=("Helvetica", 16))
+codigo_text.grid(column=0, row=1, sticky=(tk.W, tk.E, tk.N, tk.S))
 
-# Cria a lista suspensa para selecionar a linguagem
-linguagem_label = ttk.Label(janela, text="Linguagem:")
-linguagem_combobox = ttk.Combobox(janela, values=["Python", "Java", "C"], state="readonly")
-linguagem_combobox.current(0)  # Define o valor padrão da lista suspensa
-linguagem_label.pack()
-linguagem_combobox.pack(pady=5)
+scrollbar_y = ttk.Scrollbar(mainframe, orient=tk.VERTICAL, command=codigo_text.yview)
+scrollbar_y.grid(column=1, row=1, sticky=(tk.N, tk.S))
 
-# Defina um tamanho mínimo para a janela
-janela.minsize(400, 300)
+scrollbar_x = ttk.Scrollbar(mainframe, orient=tk.HORIZONTAL, command=codigo_text.xview)
+scrollbar_x.grid(column=0, row=2, sticky=(tk.W, tk.E))
 
-# Ajuste o espaçamento entre os elementos
-codigo_text.pack(pady=10)
-corrigir_button.pack(pady=5)
-abrir_button.pack(pady=5)
-salvar_button.pack(pady=5)
-limpar_button.pack(pady=5)
-copiar_button.pack(pady=5)
-feedback_label.pack(pady=10)
+codigo_text.config(yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set)
 
+linguagem_var = tk.StringVar()
+linguagem_combobox = ttk.Combobox(mainframe, textvariable=linguagem_var, values=["Python", "Java", "C"], state="readonly", font=("Helvetica", 16))
+linguagem_combobox.set("Python")
+linguagem_combobox.grid(column=0, row=4, sticky=(tk.W, tk.E, tk.N, tk.S))
 
-# Inicia o loop principal da janela
-janela.mainloop()
+corrigir_button = ttk.Button(mainframe, text="Corrigir e Verificar", command=lambda: (codigo_text.get('1.0', 'end'), linguagem_var.get()), style="BW.TButton")
+corrigir_button.grid(column=0, row=5, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+copiar_button = ttk.Button(mainframe, text="Copiar Código", command=copiar_codigo, style="BW.TButton")
+copiar_button.grid(column=0, row=6, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+dark_var = tk.BooleanVar()
+dark_mode_checkbutton = tk.Checkbutton(mainframe, text="Modo Noturno", variable=dark_var, command=toggle_dark_mode, font=("Helvetica", 16))
+dark_mode_checkbutton.grid(column=0, row=7, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+root.mainloop()
